@@ -7,7 +7,7 @@ import "hardhat/console.sol";
 interface tokenRecipent {
     function receiveApproval(
         address _from,
-        address _to,
+        uint256 _value,
         address _token,
         bytes calldata _extraData
     ) external;
@@ -99,7 +99,7 @@ contract BrooklynTokenBLT {
     }
 
     /**
-     * @dev Transfer "_value" tokens to "_to" from your account.
+     * @dev transfer function - Transfer "_value" tokens to "_to" from your account.
      * @param _to - Address of receiver.
      * @param _value - Amount to Send.
      */
@@ -109,7 +109,7 @@ contract BrooklynTokenBLT {
     }
 
     /**
-     * @dev Transfer tokend from other address. Send "_value" tokens to "_to" on behalf of "_from".
+     * @dev transferFrom function - Transfer tokend from other address. Send "_value" tokens to "_to" on behalf of "_from".
      * @param _from - Address of Sender.
      * @param _to - Address of Receiver.
      * @param _value - Amount to Send.
@@ -124,4 +124,29 @@ contract BrooklynTokenBLT {
         return true;
     }
 
+    /**
+     * @dev approve function - Set allowances for other address. Allows "_spender" to spend no more than "_value" of token on your behalf.
+     * @param _spender - Authorized address to spend.
+     * @param _value - Maximum amount "_spender" can spend.
+     */
+    function approve(address _spender, uint256 _value) public returns (bool success) {
+        allowance[msg.sender][_spender] = _value;
+        emit Approve(msg.sender, _spender, _value);
+        return true;
+    }
+
+    /**
+     * @dev approveAndCall function - Set allowance for other address and notfiy. Allow "_spender" to spend no more than
+     * "_value" tokens on your behalf, and then notify the contract about it.
+     * @param _spender - Authorized address to spend.
+     * @param _value - Maximum amount "_spender" can spend.
+     * @param _extraData - Some extra info to send to the approved Contract.
+     */
+    function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public returns (bool success) {
+        tokenRecipent spender = tokenRecipent(_spender);
+        if (approve(_spender, _value)) {
+            spender.receiveApproval(msg.sender, _value, address(this), _extraData);
+            return true;
+        }
+    }
 }
