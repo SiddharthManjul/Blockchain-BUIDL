@@ -13,29 +13,30 @@ interface tokenRecipent {
     ) external;
 }
 
-contract ManualToken {
-    uint256 initialSupply;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+contract BrooklynTokenBLT {
 
-    // transfer tokens.
-    // Subtract "from" address amount and add to "to" address.
+    // State or Public Variables of the Token.
+    string public name;
+    string public symbol;
+    uint8 public decimals = 18;
+    uint256 public totalSupply;
 
-    function _transfer(address from, address to, uint256 amount) public {
-        balanceOf[from] -= amount;
-        balanceOf[to] += amount;
-    }
+    // Mappings.
 
-    function _transferFrom(
-        address _from,
-        address _to,
-        uint256 _value
-    ) public returns (bool success) {
-        // implement taking fun from the user.
-        require(_value <= allowance[_from][msg.sender]);
-        allowance[_from][msg.sender] -= _value;
-        allowance[_to][msg.sender] += _value;
-        _transfer(_from, _to, _value);
-        return true;
-    }
+    // Balance in terms of int, finding against an address.
+    mapping (address => uint256) public balanceOf;
+
+    // Address allowing another address to spend in terms of int.
+    mapping (address => mapping (address => uint256)) allowance;
+
+    // Events.
+
+    // Notifying about the Transfer.
+    event Transfer(address indexed from, address indexed to, uint256 value); 
+
+    // Notifying about the Approval from owner to Spender.
+    event Approve(address indexed _owner, address indexed _spender, uint256 _value); 
+
+    // Notifying clients about the amount burned.
+    event Burn(address indexed from, uint256 value); 
 }
