@@ -65,7 +65,7 @@ contract BrooklynTokenBLT {
      * @dev _transfer function - for internal transfer, can be called by contract only.
      * @param _from - Sender address.
      * @param _to - Receiver address.
-     * @param _value - Amount sent.
+     * @param _value - Amount to send.
      */
     function _transfer(address _from, address _to, uint256 _value) internal {
         
@@ -97,4 +97,31 @@ contract BrooklynTokenBLT {
 
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
+
+    /**
+     * @dev Transfer "_value" tokens to "_to" from your account.
+     * @param _to - Address of receiver.
+     * @param _value - Amount to Send.
+     */
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+        _transfer(msg.sender, _to, _value);
+        return true;
+    }
+
+    /**
+     * @dev Transfer tokend from other address. Send "_value" tokens to "_to" on behalf of "_from".
+     * @param _from - Address of Sender.
+     * @param _to - Address of Receiver.
+     * @param _value - Amount to Send.
+     */
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+
+        // Check Allowance.
+        require(_value <= allowance[_from][msg.sender]); 
+
+        allowance[_from][msg.sender] -= _value;
+        _transfer(_from, _to, _value);
+        return true;
+    }
+
 }
