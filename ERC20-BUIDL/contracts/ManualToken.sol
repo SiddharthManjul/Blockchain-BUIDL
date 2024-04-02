@@ -13,7 +13,7 @@ interface tokenRecipent {
     ) external;
 }
 
-contract BrooklynTokenBLT {
+contract LocalERC20 {
     // State or Public Variables of the Token.
     string public name;
     string public symbol;
@@ -148,5 +148,50 @@ contract BrooklynTokenBLT {
             spender.receiveApproval(msg.sender, _value, address(this), _extraData);
             return true;
         }
+    }
+
+    /**
+     * @dev burn function - Remove "_value" tokens from the system irreversibly.
+     * @param _value - Amount of money to burn.
+     */
+    function burn(uint256 _value) public returns(bool) {
+
+        // Check if the sender has enough amount of tokens.
+        require(balanceOf[msg.sender] >= _value);
+
+        // Subtract the given amount from sender.
+        balanceOf[msg.sender] -= _value;
+
+        // Update the totalSupply.
+        totalSupply -= _value;
+
+        emit Burn(msg.sender, _value);
+        return true;
+    }
+
+    /**
+     * @dev burnFrom function - Remove "_value" tokens from the system irreversibly on behalf of "_from".
+     * @param _from - Sender address.
+     * @param _value - Amount of money to burn.
+     */
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
+        
+        // Check is the target balance is enough.
+        require(balanceOf[_from] >= _value);
+
+        // Check allowance.
+        require(_value <= allowance[_from][msg.sender]);
+
+        // Subtract from target balance.
+        balanceOf[_from] -= _value;
+
+        // Subtract from the sender's allowance.
+        allowance[_from][msg.sender] -= _value;
+
+        // Update the initial supply.
+        totalSupply -= _value;
+
+        emit Burn(msg.sender, _value);
+        return true;
     }
 }
