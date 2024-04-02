@@ -13,7 +13,7 @@ interface tokenRecipent {
     ) external;
 }
 
-contract LocalERC20 {
+contract ManualToken {
     // State or Public Variables of the Token.
     string public name;
     string public symbol;
